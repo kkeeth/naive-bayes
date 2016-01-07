@@ -24,9 +24,6 @@ $doc = "PHPとJavaScriptで機械学習を勉強する。";
 
 にてカテゴライズしたい文章を設定後、実行してください。
 
-### 参考記事
-こちらの記事を参考にさせていただきました。http://gihyo.jp/dev/serial/01/machine-learning/0003
-
 ### ラインセンス
 ライセンスは「[MIT License](https://github.com/k-kuwahara/naive_bayes/blob/master/LICENSE.md)」です。
 
