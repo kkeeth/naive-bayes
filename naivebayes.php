@@ -14,7 +14,7 @@ class NaiveBayes {
 
       // 初期化
       foreach ($arrCat as $cat) {
-         // 分割したテキスト
+         // 各カテゴリの学習用テキスト
          $file = file_get_contents("/path_to_text_directory/{$cat}.txt", true);
          // 改行コードをカンマに変換
          $file = str_replace(array("\r\n", "\r", "\n"), ",", $file);
