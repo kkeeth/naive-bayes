@@ -5,6 +5,7 @@
 ### 開発環境
 - PHP 5.5
 - Mecab
+- php-mecab 
 
 ### 使い方
 各カテゴリの学習用ドキュメントを`*.txt`を読み込む。保存先は`naivebayes.php`の18行目、
