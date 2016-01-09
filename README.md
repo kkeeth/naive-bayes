@@ -7,6 +7,8 @@
 - Mecab
 - php-mecab 
 
+最後に`composer install`コマンドを実行してください。
+
 ### 使い方
 各カテゴリの学習用ドキュメントを`*.txt`を読み込む。保存先は`naivebayes.php`の18行目、
 
@@ -24,6 +26,16 @@ $doc = "PHPとJavaScriptで機械学習を勉強する。";
 ```
 
 にてカテゴライズしたい文章を設定後、実行してください。
+
+### テスト
+本プログラムでは、testディレクトリの中の`___各カテゴリ名___.txt`のファイル学習用テキストファイルとして取り込み、
+その後ダミー文言を判別しています。  
+実行には以下のコマンドを叩いてください。
+
+```bash
+cd path_to_application/test/
+php ../vendor/bin/phpunit naivebayes_test.php
+```
 
 ### ラインセンス
 ライセンスは「[MIT License](https://github.com/k-kuwahara/naive_bayes/blob/master/LICENSE.md)」です。
