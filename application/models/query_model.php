@@ -78,49 +78,4 @@ class Query_model extends CI_Model {
 
         return true;
     }
-
-    /**
-     * レコード論理削除メソッド
-     * @param　String $table テーブル情報
-     * @param Array $params WHERE句パラメータ キー:条件値
-     * @return bool 登録成功・失敗
-     */
-    public function logicalDelete($table, $params = '') {
-        $ph = array();
-
-        if ($params != '') {
-            foreach($params as $key => $val) {
-                $ph[] = sprintf('`%s`= ?', $key);
-            }
-            $sql = sprintf('UPDATE %s SET del_flg = 1 WHERE %s', $table, implode(' AND ', $ph));
-            return $this->db->query($sql, array_values($params));
-
-        } else {
-            $sql = sprintf('UPDATE %s SET del_flg = 1', $table);
-            return $this->db->query($sql, array());
-        }
-    }
-
-    /**
-     * レコード物理削除メソッド
-     * @param　String $table テーブル情報
-     * @param Array $params WHERE句パラメータ キー:条件値
-     * @return bool 登録成功・失敗
-     */
-    public function physicalDelete($table, $params = '') {
-        $ph = array();
-
-        if ($params != '') {
-            foreach($params as $key => $val) {
-                $ph[] = sprintf('`%s`= ?', $key);
-            }
-            $sql = sprintf('DELETE FROM %s WHERE %s', $table, implode(' AND ', $ph));
-            return $this->db->query($sql, array_values($params));
-
-        } else {
-            // 全件削除
-            $sql = sprintf('DELETE FROM %s', $table);
-            return $this->db->query($sql, array());
-        }
-    }
 }
