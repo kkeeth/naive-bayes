@@ -20,16 +20,17 @@
    </head>
    <body>
       <div class="container">
+         <p class="lead">ナイーブベイズのデモ</p>
          <form action="/naivebayes" name="filter" method="post">
             <div class="form-group">
-               <p class="lead">カテゴリ(必須）</p>
+               <label for="category">カテゴリ</label>
                <!--{if $arrErr.category != ''}-->
                   <div class="alert alert-danger" role="alert"><!--{$arrErr.category|escape}--></div>
                <!--{/if}-->
                <input type="text" name="category" class="form-control" id="category" placeholder="カテゴリを入力してください。" value="<!--{$category|default:''|escape}-->" />
             </div>
             <div class="form-group">
-               <p class="lead">テキスト（必須）</p>
+               <label for="document">登録・分類するテキスト（必須）</label>
                <!--{if $arrErr.document != ''}-->
                   <div class="alert alert-danger" role="alert"><!--{$arrErr.document|escape}--></div>
                <!--{/if}-->

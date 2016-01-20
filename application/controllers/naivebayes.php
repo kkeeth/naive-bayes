@@ -23,8 +23,7 @@ class Naivebayes extends My_Controller {
                $this->_assign('discriminate', '学習');
             } else {
                // 分類処理
-               $doc = "PHPとJavaScriptで機械学習を勉強する。";
-               $this->_assign('result', $this->classifier(mecab_split($doc)));
+               $this->_assign('result', $this->classifier(mecab_split($_POST['document'])));
                $this->_assign('discriminate', '分類');
             }
             break;
@@ -73,7 +72,12 @@ class Naivebayes extends My_Controller {
 
    // P(cat)を計算
    private function priorProb($cat) {
-      return (float)$this->catCount[$cat] / array_sum($this->catCount);
+      // 全カテゴリのカウントの合計を取得
+      $sum = array_reduce($this->categories, function($sum, $param) {
+         $sum += $param['count'];
+         return $sum;
+      });
+      return (float)$cat['count'] / $sum;
    }
 
 
@@ -99,22 +103,30 @@ class Naivebayes extends My_Controller {
 
    // 単語$wordがカテゴリ$catに含まれる確率
    private function getWordCountInCat($word, $cat) {
-      foreach ($this->wordCount[$cat] as $key => $val) {
-         if ($key === $word) {
-            return $val;
+      // モデルの読み込み
+      $this->load->model('naivebayes_model');
+      // catに紐づく全単語情報を取得
+      $registWords = $this->naivebayes_model->getWord($word, $cat['category_id']);
+      foreach ($registWords as $val) {
+         if ($val['word'] === $word) {
+            return $val['count'];
          }
       }
       return 0.0;
    }
 
 
-   // 全単語がカテゴリ$catに含まれる確率
+   // catに紐づく全単語のカウント数
    private function getAllWordCountInCat($cat) {
       $total = 0;
+      // モデルの読み込み
+      $this->load->model('naivebayes_model');
+      // catに紐づく全単語情報を取得
+      $registWords = $this->naivebayes_model->getWord('', $cat['category_id']);
 
-      foreach ($this->wordCount as $key => $val) {
-         if ($key === $cat) {
-            $total += array_sum($this->wordCount[$cat]);
+      foreach ($registWords as $key => $val) {
+         if ($val['category_id'] === $cat['category_id']) {
+            $total += $val['count'];
          }
       }
 
@@ -133,15 +145,20 @@ class Naivebayes extends My_Controller {
 
    // カテゴリの推定
    public function classifier($words) {
+      // モデルの読み込み
+      $this->load->model('naivebayes_model');
       $best = ''; // 最適なカテゴリ
       $max = 0;
 
+      // 全カテゴリ情報を取得
+      $this->categories = $this->naivebayes_model->getCategory();
+
       // カテゴリ毎に確率値求める
-      foreach (array_keys($this->catCount) as $cat) {
+      foreach ($this->categories as $cat) {
          $prob = $this->score($words, $cat);
          if ($prob < $max) {
            $max  = $prob;
-           $best = $cat;
+           $best = $cat['name'];
          }
       }
 
@@ -161,13 +178,17 @@ class Naivebayes extends My_Controller {
         $this->load->library('form_validation');
 
         // バリデーションのセット
-        $this->form_validation->set_rules('category', 'カテゴリ', 'required');
+        if ($arrPost['btnSubmit'] == 'learning') {
+          $this->form_validation->set_rules('category', 'カテゴリ', 'required');
+        }
         $this->form_validation->set_rules('document', 'テキスト', 'required');
 
         if ($this->form_validation->run() == FALSE) {
             // エラーメッセージのセット
             $errors = array();
-            $errors['category'] = trim(form_error('category'));
+            if ($arrPost['btnSubmit'] == 'learning') {
+               $errors['category'] = trim(form_error('category'));
+            }
             $errors['document'] = trim(form_error('document'));
 
             // パラメータのアサイン

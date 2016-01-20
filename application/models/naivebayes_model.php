@@ -104,17 +104,18 @@ class Naivebayes_model extends CI_Model {
     * @param cat:String カテゴリ
     * @return ret:Array カテゴリ情報の配列
     */
-   public function getCategory($cat, $col = '*') {
+   public function getCategory($cat = '', $col = '*') {
       // モデルの読み込み
       $this->load->model('query_model');
-      $result = FALSE;
 
       try {
-         $ret = $this->query_model->select('category_count', $col,
-            array(
+         $where = '';
+         if ($cat != '') {
+            $where = array(
                'name' => $cat,
-            )
-         );
+            );
+         }
+         $ret = $this->query_model->select('category_count', $col, $where);
          if ($ret === FALSE) throw new Exception('データベース参照エラーが発生');
          $result = $ret->result_array();
 
@@ -131,18 +132,23 @@ class Naivebayes_model extends CI_Model {
     * @param catId:Int カテゴリID
     * @return ret:Array 単語情報の配列
     */
-   public function getWord($word, $catId) {
+   public function getWord($word = '', $catId) {
       // モデルの読み込み
       $this->load->model('query_model');
-      $result = FALSE;
 
       try {
-         $ret = $this->query_model->select('word_count', '*',
-            array(
+         $where = '';
+         if ($word != '') {
+            $where = array(
                'word'        => $word,
                'category_id' => $catId,
-            )
-         );
+            );
+         } else {
+            $where = array(
+               'category_id' => $catId,
+            );
+         }
+         $ret = $this->query_model->select('word_count', '*', $where);
          if ($ret === FALSE) throw new Exception('データベース参照エラーが発生');
          $result = $ret->result_array();
 
