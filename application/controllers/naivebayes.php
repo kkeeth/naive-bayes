@@ -6,72 +6,68 @@ class Naivebayes extends My_Controller {
       parent::__construct();
       $this->wordCount = [];
       $this->catCount  = [];
-      $doc = "PHPとJavaScriptで機械学習を勉強する。";
-      $this->classifier(mecab_split($doc));
    }
 
    // 実行
    public function index() {
-      // ダミーの初期カテゴリ配列　※重複はないものとする
-      $arrCat = ['php', 'javascript', 'python'];
+      switch ($_SERVER['REQUEST_METHOD']) {
+         case 'POST':
+            // 学習処理
+            $checkResult = $this->checkValidate($_POST);
+            $this->_assign('category', $_POST['category']);
+            $this->_assign('document', $_POST['document']);
+            if ($checkResult === FALSE) break;
 
+            if ($_POST['btnSubmit'] == 'learning') {
+               $this->train($_POST['document'], $_POST['category']);
+               $this->_assign('discriminate', '学習');
+            } else {
+               // 分類処理
+               $doc = "PHPとJavaScriptで機械学習を勉強する。";
+               $this->_assign('result', $this->classifier(mecab_split($doc)));
+               $this->_assign('discriminate', '分類');
+            }
+            break;
+
+         case 'GET':
+            // 学習記録を取得
+            break;
+
+         case 'default':
+            break;
+      }
+      $this->_view("naivebayes.tpl");
+   }
+
+   // 学習
+   public function train($doc, $cat) {
+      // モデルの読み込み
+      $this->load->model('naivebayes_model');
       // 初期化
-      foreach ($arrCat as $cat) {
-         // 各カテゴリの学習用テキスト
-         $file = file_get_contents("./{$cat}.txt", true);
          // 改行コードをカンマに変換
-         $file = str_replace(array("\r\n", "\r", "\n"), ",", $file);
+         $doc = str_replace(array("\r\n", "\r", "\n"), ",", $doc);
          // カンマごとに分割
-         $lines = explode(',', $file);
+         $lines = explode(',', $doc);
          // 頭の空白を除去
          foreach ($lines as $key => $line) {
-            if ($line != "") $docs[$cat][] = trim($line);
+            if ($line != "") $docs[] = trim($line);
          }
          $this->wordCount[$cat] = [];
-         $this->catCount  = [];
-      }
 
-      // 各カテゴリの文章毎に学習
-      foreach ($arrCat as $cat) {
-         $this->train($docs[$cat], $cat);
-      }
-      $this->_view("naive_bayes.tpl");
+         foreach ($docs as $key => $val) {
+            // 単語・カテゴリの出現回数をセット
+            $result = $this->naivebayes_model->registerWord(mecab_split($val), $cat);
+
+            if ($result === FALSE) {
+              show_error($mess . 'しました。もう一度お手続きください。');
+            }
+         }
    }
 
 
    // 文章を単語に分割
    public function getWords($doc) {
       return mecab_split($doc);
-   }
-
-
-   // 単語の出現数を登録
-   private function wordCountSet($words, $cat) {
-      // 単語配列が空の場合終了
-      if ($words == "") return -1;
-
-      // 単語の出現回数をセット
-      foreach ($words as $val) {
-         if (array_key_exists($val, $this->wordCount[$cat]) === false) $this->wordCount[$cat][$val] = 0;
-         $this->wordCount[$cat][$val]++;
-      }
-   }
-
-
-   // カテゴリの文章出現数を登録
-   private function catCountSet($cat) {
-      if (array_key_exists($cat, $this->catCount) === false) $this->catCount[$cat] = 0;
-      // 単語の出現回数をセット
-      $this->catCount[$cat]++;
-   }
-
-
-   // 学習
-   public function train($docs, $cat) {
-      foreach ($docs as $key => $val) {
-         $this->wordCountSet(mecab_split($val), $cat);
-         $this->catCountSet($cat);
-      }
    }
 
 
@@ -149,7 +145,37 @@ class Naivebayes extends My_Controller {
          }
       }
 
+      // 全単語がDBに登録されていない場合
+      if ($best == '') $best = "登録されていない単語のみのため、判別できません。";
+
       return $best;
    }
+
+
+    /**
+     * バリデーションチェック
+     * @param Array フォームの値
+     * @return Array エラー内容
+     */
+    private function checkValidate($arrPost) {
+        $this->load->library('form_validation');
+
+        // バリデーションのセット
+        $this->form_validation->set_rules('category', 'カテゴリ', 'required');
+        $this->form_validation->set_rules('document', 'テキスト', 'required');
+
+        if ($this->form_validation->run() == FALSE) {
+            // エラーメッセージのセット
+            $errors = array();
+            $errors['category'] = trim(form_error('category'));
+            $errors['document'] = trim(form_error('document'));
+
+            // パラメータのアサイン
+            $this->_assign('arrErr', $errors);
+            return FALSE;
+        }
+
+        return TRUE;
+    }
 }
 
