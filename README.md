@@ -4,44 +4,85 @@
 
 ### 実行環境
 以下がインストールされていることを想定しています。
-- PHP 5.5
+
+- Apache 2.2
+- PHP 5.4以上
+- MySQL 5.6
 - Mecab
-- php-mecab 
+- php-mecab
 - Composer
 
-最後に`composer install`コマンドを実行してください。
+### 環境構築
+#### ソースのダウンロード
+[こちら](https://github.com/k-kuwahara/naive_bayes/archive/webApp.zip)より圧縮したソースをダウンロードしてください。
 
-### 使い方
-各カテゴリの学習用ドキュメントを`*.txt`を読み込む。保存先は`naivebayes.php`の18行目、
-
-```php
-<?php
-$file = file_get_contents("/path_to_text_directory/{$cat}.txt", true);
-```
-
-にて設定してください。  
-その後、同ファイルの終わりから1行前
-
-```php
-<?php
-$doc = "PHPとJavaScriptで機械学習を勉強する。";
-```
-
-にてカテゴライズしたい文章を設定後、実行してください。
-
-### テスト
-本プログラムでは、testディレクトリの中の`___各カテゴリ名___.txt`のファイル学習用テキストファイルとして取り込み、
-その後ダミー文言を判別しています。  
-実行には以下のコマンドを叩いてください。
+#### パッケージ・ライブラリのインストール
 
 ```bash
-cd path_to_application/test/
-php ../vendor/bin/phpunit naivebayes_test.php
+$ composer self-update
+$ composer install
 ```
+
+#### Apacheの設定
+以下を追記して再起動してください。
+```apache
+# ディレクティブの追記
+<IfModule mod_rewrite.c>
+    RewriteEngine on
+    RewriteCond %{REQUEST_URI} !\.(css|pdf|png|jpe?g|gif|js|swf|txt|ico|s?html?)$
+    RewriteRule ^(.*)$ /index.php/$1 [L]
+</IfModule>
+```
+
+#### データベース接続設定
+`application/config/***/database.php`を編集してください。※`development, testing, production`の三つとも編集する必要があります。主に変更するのは以下の部分です。
+
+```php
+<?php
+'hostname' => 'localhost',
+'username' => 'username',
+'password' => 'password',
+'database' => 'database',
+'dbdriver' => 'mysql',
+```
+
+開発用(development)、テスト用(testing)、本番用(production)と分かれていますので、適宜`index.php`の`define('ENVIRONMENT', 'development');`の部分を変更してください。
+
+#### マイグレーションの設定
+`application/config/migration.php`ファイルより、マイグレーションの有効化・バージョンの設定を行ってください。
+
+```php
+<?php
+$config['migration_enabled'] = TRUE;
+$config['migration_version'] = 2;   // カスタマイズした際は適宜変更
+```
+
+#### マイグレーションの実行
+このアプリケーションでは、マイグレーションをコマンドラインから実行するため、先にデータベースを作成してください。
+作成後、以下のコマンドをコマンドラインから実行してください。
+
+```bash
+# ディレクトリ移動
+$ cd APP_ROOT
+
+# マイグレーションの実行
+$ php index.php migrate current
+
+# 以下のコマンドでも実行できます
+# ※このコマンドではマイグレーションの設定は不要です
+$ php index.php migrate latest
+```
+
+### 使い方
+- 学習する場合  
+カテゴリ、テキスト入力フォームどちらにも入力し、「学習」ボタンを押下してください。
+
+- 分類する場合  
+テキスト入力フォームのみ入力、「分類」ボタンを押下してください。
+
 
 ### ラインセンス
 ライセンスは「[MIT License](https://github.com/k-kuwahara/naive_bayes/blob/master/LICENSE.md)」です。
 
 ### その他
-今後は、MySQLにて学習した文章と分割した単語をDBにて保存し、育てられるようにしたいと思います。  
 コードレビュー、ご意見をいつでもお待ちしております！
