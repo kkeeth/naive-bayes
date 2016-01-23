@@ -154,7 +154,7 @@ class Naivebayes extends MY_Controller
         // モデルの読み込み
         $this->load->model('naivebayes_model');
         // catに紐づく全単語情報を取得
-        $registWords = $this->naivebayes_model->getWord($word, $cat['category_id']);
+        $registWords = $this->naivebayes_model->get_word($word, $cat['category_id']);
         foreach ($registWords as $val) {
             if ($val['word'] === $word) {
                 return $val['count'];
@@ -176,7 +176,7 @@ class Naivebayes extends MY_Controller
         // モデルの読み込み
         $this->load->model('naivebayes_model');
         // catに紐づく全単語情報を取得
-        $regist_words = $this->naivebayes_model->get_Word('', $cat['category_id']);
+        $regist_words = $this->naivebayes_model->get_word('', $cat['category_id']);
 
         foreach ($regist_words as $key => $val) {
             if ($val['category_id'] === $cat['category_id']) {
@@ -218,7 +218,7 @@ class Naivebayes extends MY_Controller
         $max = 0;
 
         // 全カテゴリ情報を取得
-        $this->categories = $this->naivebayes_model->getCategory();
+        $this->categories = $this->naivebayes_model->get_category();
 
         // カテゴリ毎に確率値求める
         foreach ($this->categories as $cat) {

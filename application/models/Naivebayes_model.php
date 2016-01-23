@@ -11,9 +11,9 @@ class Naivebayes_model extends CI_Model
     *
     * @param  Array  $words 単語（String）の配列
     * @param  String $cat   カテゴリ
-    * @return bool
+    * @return Bool
     */
-    public function registerWord($words, $cat) 
+    public function register_word($words, $cat)
     {
         // モデルの読み込み
         $this->load->model('query_model');
@@ -21,9 +21,9 @@ class Naivebayes_model extends CI_Model
 
         try {
             // カテゴリの新規登録or更新
-            $this->registerCategory($cat);
+            $this->register_category($cat);
             // カテゴリIDの取得
-            $cat_id = $this->getCategory($cat, 'category_id');
+            $cat_id = $this->get_category($cat, 'category_id');
             if ($cat_id === false) {
                 throw new Exception('データベース参照エラーが発生'); 
             }
@@ -31,7 +31,7 @@ class Naivebayes_model extends CI_Model
             // 単語ごとにDB登録
             foreach ($words as $word) {
                 // catに紐づく単語の登録チェック
-                $exist_check = $this->getWord($word, $cat_id[0]['category_id']);
+                $exist_check = $this->get_word($word, $cat_id[0]['category_id']);
                 if ($exist_check === false) {
                     throw new Exception('データベース参照エラーが発生'); 
                 }
@@ -74,7 +74,7 @@ class Naivebayes_model extends CI_Model
      * カテゴリの登録
      *
      * @param  String $cat カテゴリ
-     * @return bool
+     * @return Bool
      */
     public function register_category($cat)
     {
@@ -84,7 +84,7 @@ class Naivebayes_model extends CI_Model
 
         try {
             // カテゴリの存在チェック
-            $exist_check = $this->getCategory($cat, 'category_id, count');
+            $exist_check = $this->get_category($cat, 'category_id, count');
             if ($exist_check === false) {
                 throw new Exception('データベース参照エラーが発生'); 
             }
@@ -127,7 +127,7 @@ class Naivebayes_model extends CI_Model
      * @param  String $col 抽出カラム
      * @return Array カテゴリ情報の配列
      */
-    public function getCategory($cat = '', $col = '*')
+    public function get_category($cat = '', $col = '*')
     {
         // モデルの読み込み
         $this->load->model('query_model');
@@ -159,7 +159,7 @@ class Naivebayes_model extends CI_Model
      * @param  Int    $cat_id カテゴリID
      * @return ret:Array 単語情報の配列
      */
-    public function getWord($word = '', $cat_id)
+    public function get_word($word = '', $cat_id)
     {
         // モデルの読み込み
         $this->load->model('query_model');
