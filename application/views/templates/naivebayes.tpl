@@ -37,7 +37,7 @@
                <textarea name="document" cols="70" rows="8" class="form-control" id="document" placeholder="学習・分類させるテキストを入力してください。"><!--{$document|default:''|escape}--></textarea>
             </div>
             <div class="form-group">
-               <button name="btnSubmit" class="btn btn-info btn-lg" value="learning"><b>学習</b></button>
+               <button name="btn_submit" class="btn btn-info btn-lg" value="learning"><b>学習</b></button>
                <button name="btnSubmit" class="btn btn-success btn-lg" value="filter"><b>分類</b></button>
             </div>
          </form>
