@@ -24,21 +24,21 @@
          <form action="/naivebayes" name="filter" method="post">
             <div class="form-group">
                <label for="category">カテゴリ</label>
-               <!--{if $arrErr.category != ''}-->
-                  <div class="alert alert-danger" role="alert"><!--{$arrErr.category|escape}--></div>
+               <!--{if $errors.category != ''}-->
+                  <div class="alert alert-danger" role="alert"><!--{$errors.category|escape}--></div>
                <!--{/if}-->
                <input type="text" name="category" class="form-control" id="category" placeholder="カテゴリを入力してください。" value="<!--{$category|default:''|escape}-->" />
             </div>
             <div class="form-group">
                <label for="document">登録・分類するテキスト（必須）</label>
-               <!--{if $arrErr.document != ''}-->
-                  <div class="alert alert-danger" role="alert"><!--{$arrErr.document|escape}--></div>
+               <!--{if $errors.document != ''}-->
+                  <div class="alert alert-danger" role="alert"><!--{$errors.document|escape}--></div>
                <!--{/if}-->
                <textarea name="document" cols="70" rows="8" class="form-control" id="document" placeholder="学習・分類させるテキストを入力してください。"><!--{$document|default:''|escape}--></textarea>
             </div>
             <div class="form-group">
                <button name="btn_submit" class="btn btn-info btn-lg" value="learning"><b>学習</b></button>
-               <button name="btnSubmit" class="btn btn-success btn-lg" value="filter"><b>分類</b></button>
+               <button name="btn_submit" class="btn btn-success btn-lg" value="filter"><b>分類</b></button>
             </div>
          </form>
          <!--{if $result !== '' && $result !== NULL}--><p class="lead">推定カテゴリ：<!--{$result|escape}--></p><!--{/if}-->

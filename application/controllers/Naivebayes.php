@@ -263,7 +263,7 @@ class Naivebayes extends MY_Controller
             $errors['document'] = trim(form_error('document'));
 
             // パラメータのアサイン
-            $this->_assign('arrErr', $errors);
+            $this->_assign('errors', $errors);
             return false;
         }
 
