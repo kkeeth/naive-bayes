@@ -7,12 +7,13 @@ class Migrate extends CI_Controller
         // コマンドラインから実行されていることを確認
         if(!$this->input->is_cli_request()) {
             log_message('error', 'Request from HTTP is not allowed.');
-            return FALSE;
+            return false;
         }
         $this->load->library('migration');
     }
 
-    function current() {
+    function current()
+    {
         if ($this->migration->current()) {
             log_message('debug', 'Migration Success.');
         } else {
