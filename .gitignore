@@ -1,9 +1,9 @@
 composer.lock
 
-./application/config/development/*
-./application/config/testing/*
-./application/config/production/*
-./application/logs/*
+application/config/development/*
+application/config/testing/*
+application/config/production/*
+application/logs/*
 !application/logs/index.html$
 !application/logs/.htaccess
-./application/cache/*
+application/cache/templates_c/*
