@@ -15,8 +15,6 @@ class Naivebayes_model extends CI_Model
     */
     public function register_word($words, $cat)
     {
-        // モデルの読み込み
-        $this->load->model('query_model');
         $result = false;
 
         try {
@@ -37,28 +35,23 @@ class Naivebayes_model extends CI_Model
                 }
 
                 if (empty($exist_check)) {
-                    $result = $this->query_model->insert(
-                        'word_count', 
-                        [
-                            'word'              => $word,
-                            'category_id'       => $cat_id[0]['category_id'],
-                            'last_learned_date' => date('Y-m-d H:i:s'),
-                            'count'             => 1,
-                        ]
-                    );
+                    $data = [
+                        'word'              => $word,
+                        'category_id'       => $cat_id[0]['category_id'],
+                        'last_learned_date' => date('Y-m-d H:i:s'),
+                        'count'             => 1,
+                    ];
+                    $result = $this->db->insert('word_count', $data);
                 } else {
-                    $result = $this->query_model->update(
-                        'word_count', 
-                        [
-                            'last_learned_date' => date('Y-m-d H:i:s'),
-                            'count'             => ++$exist_check[0]['count'],
-                        ],
-                        [
-                            'word'        => $word,
-                            'category_id' => $cat_id[0]['category_id'],
-                        ]
-                    );
+                    $data = [
+                        'last_learned_date' => date('Y-m-d H:i:s'),
+                        'count'             => ++$exist_check[0]['count'],
+                    ];
+                    $this->db->where('word', $word);
+                    $this->db->where('category_id', $cat_id[0]['category_id']);
+                    $result = $this->db->update('word_count', $data);
                 }
+
                 if ($result === false) {
                     throw new Exception('データベース登録エラーが発生'); 
                 }
@@ -78,8 +71,6 @@ class Naivebayes_model extends CI_Model
      */
     public function register_category($cat)
     {
-        // モデルの読み込み
-        $this->load->model('query_model');
         $result = false;
 
         try {
@@ -90,26 +81,21 @@ class Naivebayes_model extends CI_Model
             }
 
             if (empty($exist_check)) {
-                $result = $this->query_model->insert(
-                    'category_count', 
-                    [
-                        'name'              => $cat,
-                        'last_learned_date' => date('Y-m-d H:i:s'),
-                        'count'             => 1,
-                    ]
-                );
+                $data = [
+                    'name'              => $cat,
+                    'last_learned_date' => date('Y-m-d H:i:s'),
+                    'count'             => 1,
+                ];
+                $result = $this->db->insert('category_count', $data);
             } else {
-                $result = $this->query_model->update(
-                    'category_count', 
-                    [
-                        'last_learned_date' => date('Y-m-d H:i:s'),
-                        'count'             => ++$exist_check[0]['count'],
-                    ],
-                    [
-                        'name' => $cat,
-                    ]
-                );
+                $data = [
+                    'last_learned_date' => date('Y-m-d H:i:s'),
+                    'count'             => ++$exist_check[0]['count'],
+                ];
+                $this->db->where('name', $cat);
+                $result = $this->db->update('word_count', $data);
             }
+
             if ($result === false) {
                 throw new Exception('データベース登録エラーが発生'); 
             }
@@ -129,17 +115,15 @@ class Naivebayes_model extends CI_Model
      */
     public function get_category($cat = '', $col = '*')
     {
-        // モデルの読み込み
-        $this->load->model('query_model');
+        $result = false;
 
         try {
-            $where = '';
             if ($cat != '') {
-                $where = array(
-                'name' => $cat,
-                );
+                $this->db->where('name', $cat);
             }
-            $ret = $this->query_model->select('category_count', $col, $where);
+            $this->db->select($col);
+            $ret = $this->db->get('category_count');
+
             if ($ret === false) {
                 throw new Exception('データベース参照エラーが発生'); 
             }
@@ -161,22 +145,13 @@ class Naivebayes_model extends CI_Model
      */
     public function get_word($word = '', $cat_id)
     {
-        // モデルの読み込み
-        $this->load->model('query_model');
-
         try {
-            $where = '';
             if ($word != '') {
-                $where = [
-                    'word'        => $word,
-                    'category_id' => $cat_id,
-                ];
-            } else {
-                $where = [
-                    'category_id' => $cat_id,
-                ];
+                $this->db->where('word', $word);
             }
-            $ret = $this->query_model->select('word_count', '*', $where);
+            $this->db->where('category_id', $cat_id);
+            $ret = $this->db->get('word_count');
+
             if ($ret === false) {
                 throw new Exception('データベース参照エラーが発生'); 
             }
