@@ -7,7 +7,6 @@
 - Apache 2.2
 - PHP 5.4以上
 - MySQL 5.6
-- php-mecab
 - Composer
 
 ### 環境構築
