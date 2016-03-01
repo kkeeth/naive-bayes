@@ -8,6 +8,7 @@ class Naivebayes extends MY_Controller
         parent::__construct();
         $this->wordCount = [];
         $this->catCount  = [];
+        $this->appid     = "";
     }
 
     public function index()
@@ -19,7 +20,7 @@ class Naivebayes extends MY_Controller
             $this->_assign('category', $_POST['category']);
             $this->_assign('document', $_POST['document']);
             if ($check_result === false) {
-                break; 
+                break;
             }
 
             if ($_POST['btn_submit'] == 'learning') {
@@ -27,7 +28,8 @@ class Naivebayes extends MY_Controller
                 $this->_assign('discriminate', '学習');
             } else {
                 // 分類処理
-                $this->_assign('result', $this->classifier(mecab_split($_POST['document'])));
+                $words = $this->split_text($_POST['document']);
+                $this->_assign('result', $this->classifier($words));
                 $this->_assign('discriminate', '分類');
             }
             break;
@@ -61,31 +63,22 @@ class Naivebayes extends MY_Controller
         // 頭の空白を除去
         foreach ($lines as $key => $line) {
             if ($line != "") {
-                $docs[] = trim($line); 
+                $docs[] = trim($line);
             }
         }
         $this->word_count[$cat] = [];
 
         foreach ($docs as $key => $val) {
+            // Yahoo WebAPIにより単語分割
+            $words = $this->split_text($val);
+
             // 単語・カテゴリの出現回数をセット
-            $result = $this->naivebayes_model->register_word(mecab_split($val), $cat);
+            $result = $this->naivebayes_model->register_word($words, $cat);
 
             if ($result === false) {
                 show_error($mess . 'しました。もう一度お手続きください。');
             }
         }
-    }
-
-
-    /**
-     * 文章を単語に分割
-     *
-     * @param  String $doc 分割する文
-     * @return Array 単語配列
-     */
-    public function get_words($doc)
-    {
-        return mecab_split($doc);
     }
 
 
@@ -117,7 +110,7 @@ class Naivebayes extends MY_Controller
      */
     private function doc_prob($words, $cat)
     {
-        $prob = 1;
+        $prob = 0;
         foreach ($words as $key => $val) {
             $ret_word_prob = $this->word_prob($val, $cat);
             // P(word|cat)が0か否かで分岐
@@ -230,8 +223,8 @@ class Naivebayes extends MY_Controller
         }
 
         // 全単語がDBに登録されていない場合
-        if ($best == '') { 
-            $best = "登録されていない単語のみのため、判別できません。"; 
+        if ($best == '') {
+            $best = "登録されていない単語のみのため、判別できません。";
         }
 
         return $best;
@@ -240,7 +233,7 @@ class Naivebayes extends MY_Controller
 
     /**
      * バリデーションチェック
-     *
+     * 
      * @param  Array $post_data フォームの値
      * @return Array エラー内容
      */
@@ -269,5 +262,25 @@ class Naivebayes extends MY_Controller
 
         return true;
     }
+
+
+   /**
+    * 単語に分割
+    * 
+    * @param  String $text フォームのテキスト文章
+    * @return Array 単語配列
+    */
+   private function split_text($text)
+   {
+       $return = [];
+       $url = "http://jlp.yahooapis.jp/MAService/V1/parse?appid=" . $this->appid . "&results=ma";
+       $url .= "&sentence=".urlencode($text);
+       $xml = simplexml_load_file($url);
+       foreach ($xml->ma_result->word_list->word as $word) {
+          $return[] = (string)$word->surface;
+       }
+
+       return $return;
+   }
 }
 
