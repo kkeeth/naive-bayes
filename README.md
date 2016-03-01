@@ -7,7 +7,6 @@
 - Apache 2.2
 - PHP 5.4以上
 - MySQL 5.6
-- Mecab
 - php-mecab
 - Composer
 
@@ -70,6 +69,21 @@ $ php index.php migrate current
 # 以下のコマンドでも実行できます
 # ※このコマンドではマイグレーションの設定は不要です
 $ php index.php migrate latest
+```
+
+#### アプリケーションIDの設定
+`application/controller/Naivebayes.php`ファイルに、アプリケーションIDを設定してください。
+
+```php
+<?php
+    function __construct()
+    {
+        parent::__construct();
+        $this->wordCount = [];
+        $this->catCount  = [];
+        // アプリケーションIDを設定
+        $this->appid     = "hogehoge";
+    }
 ```
 
 ### 使い方
