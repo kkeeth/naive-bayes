@@ -8,6 +8,7 @@ class Naivebayes extends MY_Controller
         parent::__construct();
         $this->wordCount = [];
         $this->catCount  = [];
+        // アプリケーションIDを設定
         $this->appid     = "";
     }
 
