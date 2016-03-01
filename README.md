@@ -71,18 +71,18 @@ $ php index.php migrate latest
 ```
 
 #### アプリケーションIDの設定
-`application/controller/Naivebayes.php`ファイルに、アプリケーションIDを設定してください。
+`application/controllers/Naivebayes.php`ファイルに、アプリケーションIDを設定してください。
 
 ```php
 <?php
-    function __construct()
-    {
-        parent::__construct();
-        $this->wordCount = [];
-        $this->catCount  = [];
-        // アプリケーションIDを設定
-        $this->appid     = "hogehoge";
-    }
+function __construct()
+{
+    parent::__construct();
+    $this->wordCount = [];
+    $this->catCount  = [];
+    // アプリケーションIDを設定
+    $this->appid     = "hogehoge";
+}
 ```
 
 ### 使い方
