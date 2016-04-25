@@ -1,5 +1,6 @@
 composer.lock
 
+.htaccess
 application/config/development/*
 application/config/testing/*
 application/config/production/*
