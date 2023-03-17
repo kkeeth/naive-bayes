@@ -1,4 +1,7 @@
 composer.lock
+vendor
+composer.phar
+.phpunit.result.cache
 
 .htaccess
 application/config/development/*
